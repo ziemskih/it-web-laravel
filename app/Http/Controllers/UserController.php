@@ -5,23 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\MessageBag;
+use PHPUnit\Exception;
 
 class UserController extends Controller
 {
-    public function register(Request $request)
-    {
-        $validated = $request->validate([
-            'username' => 'required|unique:users|max:256',
-            'password' => 'required|max:255'
-        ]);
-
-        return User::create([
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password'])
-        ]);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -38,9 +25,22 @@ class UserController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         return User::find($id);
+    }
+
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'username' => 'required|unique:users|max:50',
+            'password' => 'required|max:100'
+        ]);
+
+        return User::create([
+            'username' => $validated['username'],
+            'password' => Hash::make($validated['password'])
+        ]);
     }
 
     /**
@@ -50,10 +50,20 @@ class UserController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
+        $validated = $request->validate([
+            'username' => 'required|unique:users|max:50',
+            'password' => 'required|max:100'
+        ]);
+
         $user = User::find($id);
-        $user->update($request->all());
+
+        if (!$user) {
+            abort(500, 'User with given ID doesn\'t exist');
+        }
+
+        $user->update($validated);
         return $user;
     }
 
