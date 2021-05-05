@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class NoteController extends Controller
 {
+    public function getUser($id) {
+        return Note::find($id)->user;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,17 +18,7 @@ class NoteController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return Note::all();
     }
 
     /**
@@ -35,51 +29,59 @@ class NoteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return Note::create([
+            'user_id' => $request->input('userId'),
+            'name' => $request->input('name'),
+            'text' => $request->input('text')
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Note  $note
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Note $note)
+    public function show(int $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Note  $note
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Note $note)
-    {
-        //
+        return Note::find($id);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Note  $note
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Note $note)
+    public function update(Request $request, int $id)
     {
-        //
+        $note = Note::find($id);
+
+        if (!$note) {
+            abort(500, 'Note with given ID doesn\'t exist');
+        }
+
+        $note->update($request->all());
+        return $note;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Note  $note
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Note $note)
+    public function destroy(int $id)
     {
-        //
+        $user = Note::find($id);
+
+        if (!$user) {
+            abort(500, 'Note with given ID doesn\'t exist');
+        }
+
+        return (Note::destroy($id) === 1) ?
+            $user :
+            response(['message' => 'Failed to delete note'], 500);
     }
 }

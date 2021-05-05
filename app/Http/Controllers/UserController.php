@@ -9,6 +9,10 @@ use PHPUnit\Exception;
 
 class UserController extends Controller
 {
+    public function getAllNotes($id) {
+        return User::find($id)->notes;
+    }
+
     /**
      * Display a listing of the resource.
      *

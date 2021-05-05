@@ -16,19 +16,7 @@
             use Illuminate\Support\Facades\Hash;
             use App\Models\User;
 
-
-//            for ($i = 2; $i < 20; ++$i) {
-//                User::create([
-//                    'username' => $i,
-//                    'password' => $i
-//                ]);
-//            }
-
-            $a = User::destroy(21);
-
-            echo '$a = ' . $a . '<br>';
-            echo ($a === 1) ? 'yes' : 'no';
-            echo '<br>';
+//            dd(User::find(1)->notes);
 
 //            echo (1 === 1) ? 'yes' : 'no';
 
