@@ -9,6 +9,10 @@ class User extends Model
 {
     use HasFactory;
 
+    public function notes() {
+        return $this->hasMany(Note::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *

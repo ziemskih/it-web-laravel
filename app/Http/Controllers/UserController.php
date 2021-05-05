@@ -73,8 +73,16 @@ class UserController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(int $id): int
+    public function destroy(int $id)
     {
-        return User::destroy($id);
+        $user = User::find($id);
+
+        if (!$user) {
+            abort(500, 'User with given ID doesn\'t exist');
+        }
+
+        return (User::destroy($id) === 1) ?
+            $user :
+            response(['message' => 'Failed to delete user'], 500);
     }
 }
