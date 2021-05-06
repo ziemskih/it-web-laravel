@@ -10,7 +10,16 @@ use PHPUnit\Exception;
 class UserController extends Controller
 {
     public function getAllNotes($id) {
-        return User::find($id)->notes;
+        $user = User::find($id);
+
+        if (!$user) {
+            return response(['message' => 'User not found'], 404);
+        }
+        if ($user->notes->isEmpty()) {
+            return response(['message' => 'User\'s notes not found'], 404);
+        }
+
+        return $user->notes;
     }
 
     /**
@@ -20,7 +29,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all();
+        $users = User::all();
+
+        return $users->isEmpty() ?
+            response(['message' => 'Users not found'], 404) :
+            $users;
     }
 
     /**
@@ -31,7 +44,11 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        return User::find($id);
+        $user = User::find($id);
+
+        return !$user ?
+            response(['message' => 'User not found'], 404) :
+            $user;
     }
 
     public function register(Request $request)
@@ -64,7 +81,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         if (!$user) {
-            abort(500, 'User with given ID doesn\'t exist');
+            return response(['message' => 'User not found'], 404);
         }
 
         $user->update($validated);
@@ -82,7 +99,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         if (!$user) {
-            abort(500, 'User with given ID doesn\'t exist');
+            return response(['message' => 'User not found'], 404);
         }
 
         return (User::destroy($id) === 1) ?

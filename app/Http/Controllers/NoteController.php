@@ -7,8 +7,18 @@ use Illuminate\Http\Request;
 
 class NoteController extends Controller
 {
-    public function getUser($id) {
-        return Note::find($id)->user;
+    public function getUser($id)
+    {
+        $note = Note::find($id);
+
+        if (!$note) {
+            return response(['message' => 'Note not found'], 404);
+        }
+        if (!$note->user) {
+            return response(['message' => 'Note\'s user not found'], 404);
+        }
+
+        return $note->user;
     }
 
     /**
@@ -18,7 +28,11 @@ class NoteController extends Controller
      */
     public function index()
     {
-        return Note::all();
+        $notes = Note::all();
+
+        return $notes->isEmpty() ?
+            response(['message' => 'Notes not found'], 404) :
+            $notes;
     }
 
     /**
@@ -29,6 +43,12 @@ class NoteController extends Controller
      */
     public function store(Request $request)
     {
+//        $validated = $request->validate([ // TODO
+//            'user_id' => 'required|unique:users|max:50',
+//            'name' => 'required|max:255',
+//            'text' => 'required|max:100'
+//        ]);
+
         return Note::create([
             'user_id' => $request->input('userId'),
             'name' => $request->input('name'),
@@ -44,7 +64,11 @@ class NoteController extends Controller
      */
     public function show(int $id)
     {
-        return Note::find($id);
+        $note = Note::find($id);
+
+        return !$note ?
+            response(['message' => 'Note not found'], 404) :
+            $note;
     }
 
     /**
@@ -59,7 +83,7 @@ class NoteController extends Controller
         $note = Note::find($id);
 
         if (!$note) {
-            abort(500, 'Note with given ID doesn\'t exist');
+            return response(['message' => 'Note not found'], 404);
         }
 
         $note->update($request->all());
@@ -74,14 +98,14 @@ class NoteController extends Controller
      */
     public function destroy(int $id)
     {
-        $user = Note::find($id);
+        $note = Note::find($id);
 
-        if (!$user) {
-            abort(500, 'Note with given ID doesn\'t exist');
+        if (!$note) {
+            return response(['message' => 'Note not found'], 404);
         }
 
         return (Note::destroy($id) === 1) ?
-            $user :
+            $note :
             response(['message' => 'Failed to delete note'], 500);
     }
 }
